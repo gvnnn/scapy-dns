@@ -3,6 +3,7 @@
 from scapy.all import sr1, IP, UDP, DNS, DNSQR
 from time import sleep
 import logging
+import os
 
 dns_address = "172.30.0.10"
 domain = "kubernetes.default.svc.cluster.local"
@@ -13,6 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 def setup_logging():
+    log_level = os.environ.get("LOG_LEVEL", "WARN").upper()
     logging.basicConfig(
         level=logging.INFO,
         format='%(asctime)s - %(message)s',
@@ -40,6 +42,7 @@ def main():
               )
         if ans:
             last_resp_addr = ans.src
+            logger.info("Got response '%s' from server %s" % (ans.an.rdata, last_resp_addr))
         else:
             logger.warning("No response after %d seconds, last response was from %s" % (
                 timeout,
